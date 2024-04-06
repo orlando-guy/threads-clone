@@ -12,4 +12,4 @@ export const commentValidation = z.object({
         message: "Minimum 3 characters"
     }),
     accountId: z.string()
-})
+}).omit({ accountId: true })
