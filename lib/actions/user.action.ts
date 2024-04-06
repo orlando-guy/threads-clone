@@ -4,6 +4,7 @@ import { connectToDB } from "@/lib/mongoose";
 import User from "../models/user.model";
 import { revalidatePath } from "next/cache";
 import Thread from "../models/thread.model";
+import { FilterQuery, SortOrder } from "mongoose";
 
 interface UpdateUserParams {
     userId: string,
@@ -12,6 +13,14 @@ interface UpdateUserParams {
     bio: string,
     image: string,
     path: string
+}
+
+interface FetchUsersProps {
+    userId: string,
+    searchString?: string,
+    pageNumber?: number,
+    pageSize?: number,
+    sortBy?: SortOrder
 }
 
 export async function updateUser({
@@ -50,17 +59,17 @@ export async function fetchUser(userId: string) {
         connectToDB()
 
         return await User.findOne({ id: userId })
-            /* .populate({
-                path: 'communities',
-                model: 'Community'
-            }) */
+        /* .populate({
+            path: 'communities',
+            model: 'Community'
+        }) */
     } catch (error: any) {
         throw new Error(`Failed to fecth user ${error.message}`)
     }
 }
 
 export default async function fetchUserThreads(userId: string) {
-     try {
+    try {
         connectToDB()
 
         // TODO: Populate community
@@ -79,8 +88,51 @@ export default async function fetchUserThreads(userId: string) {
                 }
             })
 
-            return threads
-     } catch (error: any) {
+        return threads
+    } catch (error: any) {
         throw new Error(`Failed to fetch user's threads. ${error.message}`)
-     }
-} 
+    }
+}
+
+export async function fetchUsers({
+    userId,
+    searchString = "",
+    pageNumber = 1,
+    pageSize = 20,
+    sortBy = "desc"
+}: FetchUsersProps) {
+    try {
+        connectToDB()
+
+        const skipAmount = (pageNumber - 1) * pageSize
+
+        const regex = new RegExp(searchString, "i")
+
+        const query: FilterQuery<typeof User> = {
+            id: { $ne: userId } // $ne stands for "not equal" so <- this expression means "not equal to userId"
+        }
+
+        if (searchString.trim() !== "") {
+            query.$or = [
+                { username: { $regex: regex } },
+                { name: { $regex: regex } }
+            ]
+        }
+
+        const sortOptions = { createdAt: sortBy }
+        const usersQuery = User.find(query)
+            .sort(sortOptions)
+            .skip(skipAmount)
+            .limit(pageSize)
+        
+        const totalUserCount = await User.countDocuments(query)
+
+        const users = await usersQuery.exec()
+
+        const isNext = totalUserCount > skipAmount + users.length
+
+        return { users, isNext }
+    } catch (error: any) {
+        throw new Error(`Failed to fetch Users. ${error.message}`)
+    }
+}
