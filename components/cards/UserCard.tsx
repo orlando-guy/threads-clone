@@ -23,7 +23,7 @@ const UserCard = ({
     const router = useRouter()
     return (
         <article className='user-card'>
-            <div className="user-card_ava tar">
+            <div className="user-card_avatar">
                 <Image
                     src={imgUrl}
                     alt={`${username} logo`}
