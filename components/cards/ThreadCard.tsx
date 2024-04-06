@@ -1,7 +1,5 @@
 import Image from "next/image"
 import Link from "next/link"
-import { comment } from "postcss"
-import { isContext } from "vm"
 
 interface ThreadCardProps {
     id: string,
