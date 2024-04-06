@@ -4,18 +4,21 @@ import { sidebarLinks } from '@/constants'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
 
 const Bottombar = () => {
-  const router = useRouter()
+  const { userId } = useAuth()
   const pathname = usePathname()
 
   return (
     <section className='bottombar'>
       <div className="bottombar_container">
-      {sidebarLinks.map(link => {
+        {sidebarLinks.map(link => {
           const isActive = (pathname.includes(link.route) && link.route.length > 1)
             || pathname === link.route
+
+          if (link.route === '/profile') link.route = `/profile/${userId}`
 
           return (
             <Link
