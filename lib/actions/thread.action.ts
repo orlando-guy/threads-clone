@@ -106,6 +106,7 @@ export async function addCommentToThread(
     userId: string,
     path: string
 ) {
+    // TODO: put the bellow "connectToDB()" into the trycatch block
     connectToDB()
 
     try {

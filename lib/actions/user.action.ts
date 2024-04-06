@@ -3,6 +3,7 @@
 import { connectToDB } from "@/lib/mongoose";
 import User from "../models/user.model";
 import { revalidatePath } from "next/cache";
+import Thread from "../models/thread.model";
 
 interface UpdateUserParams {
     userId: string,
@@ -57,3 +58,29 @@ export async function fetchUser(userId: string) {
         throw new Error(`Failed to fecth user ${error.message}`)
     }
 }
+
+export default async function fetchUserThreads(userId: string) {
+     try {
+        connectToDB()
+
+        // TODO: Populate community
+        const threads = User.findOne({ id: userId })
+            .populate({
+                path: 'threads',
+                model: Thread,
+                populate: {
+                    path: 'children',
+                    model: Thread,
+                    populate: {
+                        path: 'author',
+                        model: User,
+                        select: 'name image id'
+                    }
+                }
+            })
+
+            return threads
+     } catch (error: any) {
+        throw new Error(`Failed to fetch user's threads. ${error.message}`)
+     }
+} 
