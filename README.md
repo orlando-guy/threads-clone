@@ -53,6 +53,6 @@ Threads Clone with NEXT.JS! (ReactJS, NextJS, Typescript, Tailwind CSS, MongoDB,
 
 ## :handshake: Let's get in touch
 
-Have some thing to say ? Here's my LinkedIn - [@Orlando guychard](https://www.linkedin.com/in/orlando-guychard-dev)
+Have something to say ? Here's my LinkedIn - [@Orlando guychard](https://www.linkedin.com/in/orlando-guychard-dev)
 
 <div align="center">Don't forget to leave a star ⭐️</div>
